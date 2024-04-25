@@ -1,6 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        fontFamily: 'GAMERIA',
+        primaryColor: Colors.blue,
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.blue,
+          titleTextStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+          centerTitle: true,
+        ),
+        useMaterial3: true,
+      ),
+      home: const MyHomePage(title: 'Laboratorio 5'),
+    );
+  }
+}
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
 
@@ -12,8 +39,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0; // Contador total
-  int _buttonCounter =
-      0; // Contador para "Has presionado el botón esta cantidad de veces"
   TextEditingController _controller = TextEditingController();
   String _message = '';
   String _emojiImagePath =
@@ -23,21 +48,19 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       if (operation == 'add') {
         _counter += value;
-        _buttonCounter += value; // Incrementa el contador del botón
-        _setMessage('Se sumó $value al contador. Total: $_counter');
       } else if (operation == 'subtract') {
         _counter -= value;
-        _buttonCounter += value; // Incrementa el contador del botón
-        _setMessage('Se restó $value al contador. Total: $_counter');
       }
 
-      // Actualizar la ruta de la imagen del emoji en función del valor del puntaje resultado
-      if (_counter > 15) {
+      if (_counter == 15) {
         _emojiImagePath = 'assets/icons/happy_png.png';
-      } else if (_counter >= 0) {
-        _emojiImagePath = 'assets/icons/neutral_png.png';
-      } else {
+        _setMessage('Victoria');
+      } else if (_counter == 10) {
         _emojiImagePath = 'assets/icons/sad_png.png';
+        _setMessage('Derrota');
+      } else {
+        _emojiImagePath = 'assets/icons/neutral_png.png';
+        _setMessage('');
       }
     });
   }
@@ -55,130 +78,93 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Image.asset(
-              _emojiImagePath, // Ruta de la imagen del emoji
-              width: 200,
-              height: 200,
-            ),
-            const Text(
-              'Has presionado el botón esta cantidad de veces.:',
-            ),
-            Text(
-              '$_buttonCounter', // Mostrar el contador del botón en lugar del contador total
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: '   Número a sumar o restar',
-                    ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: Card(
+                margin: EdgeInsets.all(16.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Image.asset(
+                        _emojiImagePath, // Ruta de la imagen del emoji
+                        width: 200,
+                        height: 200,
+                      ),
+                      Text(
+                        '$_counter', // Mostrar el contador del botón en lugar del contador total
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                      // Nuevo widget para mostrar el mensaje de resultado
+                      Text(
+                        _message,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                        ),
+                      ),
+                      // Espacio para separar los botones de la tarjeta
+                      SizedBox(height: 20),
+                      // Row para alinear los botones horizontalmente
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: FloatingActionButton(
+                              onPressed: () {
+                                _updateCounter(1, 'add');
+                              },
+                              tooltip: 'Increment',
+                              child: SvgPicture.asset(
+                                'assets/icons/addition.svg',
+                                width: 40,
+                                height: 40,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: FloatingActionButton(
+                              onPressed: () {
+                                _updateCounter(1, 'subtract');
+                              },
+                              tooltip: 'Decrement',
+                              child: SvgPicture.asset(
+                                'assets/icons/subtraction.svg',
+                                width: 40,
+                                height: 40,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: FloatingActionButton(
+                              onPressed: () {
+                                setState(() {
+                                  _counter = 0;
+                                });
+                              },
+                              tooltip: 'Reload',
+                              child: SvgPicture.asset(
+                                'assets/icons/reload.svg',
+                                width: 40,
+                                height: 40,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    int value = int.tryParse(_controller.text) ?? 0;
-                    _controller.clear();
-                    _updateCounter(value, 'add');
-                  },
-                  icon: SvgPicture.asset(
-                    'assets/icons/addition.svg',
-                    width: 30,
-                    height: 30,
-                  ),
-                  tooltip: 'Increment',
-                ),
-                IconButton(
-                  onPressed: () {
-                    int value = int.tryParse(_controller.text) ?? 0;
-                    _controller.clear();
-                    _updateCounter(value, 'subtract');
-                  },
-                  icon: SvgPicture.asset(
-                    'assets/icons/subtraction.svg',
-                    width: 30,
-                    height: 30,
-                  ),
-                  tooltip: 'Decrement',
-                ),
-              ],
-            ),
-            // Nuevo widget para mostrar el mensaje de resultado
-            Text(
-              _message,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 18,
               ),
             ),
-          ],
-        ),
+          ),
+          // Espacio en blanco para dejar la mitad inferior vacía
+          SizedBox(height: MediaQuery.of(context).size.height / 6),
+        ],
       ),
-      persistentFooterButtons: [
-        // Sumar al contador
-        FloatingActionButton(
-          onPressed: () {
-            _updateCounter(1, 'add');
-          },
-          tooltip: 'Increment',
-          child: SvgPicture.asset(
-            'assets/icons/addition.svg',
-            width: 40,
-            height: 40,
-          ),
-        ),
-        // Restar al contador
-        FloatingActionButton(
-          onPressed: () {
-            _updateCounter(1, 'subtract');
-          },
-          tooltip: 'Decrement',
-          child: SvgPicture.asset(
-            'assets/icons/subtraction.svg',
-            width: 40,
-            height: 40,
-          ),
-        ),
-        // Reiniciar el contador del botón
-        FloatingActionButton(
-          onPressed: () {
-            setState(() {
-              _buttonCounter = 0; // Reiniciar el contador del botón
-              _setMessage(
-                  'Se reinició el contador de presiones de botón. Total: $_counter');
-            });
-          },
-          tooltip: 'Reset',
-          child: SvgPicture.asset(
-            'assets/icons/trash.svg',
-            width: 40,
-            height: 40,
-          ),
-        ),
-        FloatingActionButton(
-          onPressed: () {
-            setState(() {
-              _buttonCounter = 0;
-              _counter = 0;
-              _setMessage('Se reinició todo. Total: $_counter');
-            });
-          },
-          tooltip: 'Reload',
-          child: SvgPicture.asset(
-            'assets/icons/reload.svg',
-            width: 40,
-            height: 40,
-          ),
-        ),
-      ],
     );
   }
 }
