@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Laboratorio 4'),
+      home: const MyHomePage(title: 'Laboratorio 5'),
     );
   }
 }
