@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -14,7 +13,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue),
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.blue,
-          titleTextStyle: TextStyle(
+          titleTextStyle: const TextStyle(
             color: Colors.black,
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -23,51 +22,51 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Laboratorio 5'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0; // Contador total
-  TextEditingController _controller = TextEditingController();
-  String _message = '';
-  String _emojiImagePath =
-      'assets/icons/neutral_png.png'; // Ruta de la imagen del emoji inicial
+  int _currentIndex = 0;
+  final PageController _pageController = PageController();
 
-  void _updateCounter(int value, String operation) {
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void onPageChanged(int index) {
     setState(() {
-      if (operation == 'add') {
-        _counter += value;
-      } else if (operation == 'subtract') {
-        _counter -= value;
-      }
-
-      if (_counter == 15) {
-        _emojiImagePath = 'assets/icons/happy_png.png';
-        _setMessage('Victoria');
-      } else if (_counter == 10) {
-        _emojiImagePath = 'assets/icons/sad_png.png';
-        _setMessage('Derrota');
-      } else {
-        _emojiImagePath = 'assets/icons/neutral_png.png';
-        _setMessage('');
-      }
+      _currentIndex = index;
     });
   }
 
-  void _setMessage(String message) {
+  void onTabTapped(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void navigateToPage(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+    Navigator.pop(context);
     setState(() {
-      _message = message;
+      _currentIndex = index;
     });
   }
 
@@ -75,95 +74,174 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: const Text('Laboratorio 8'),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: Card(
-                margin: EdgeInsets.all(16.0),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Image.asset(
-                        _emojiImagePath, // Ruta de la imagen del emoji
-                        width: 200,
-                        height: 200,
-                      ),
-                      Text(
-                        '$_counter', // Mostrar el contador del botón en lugar del contador total
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
-                      // Nuevo widget para mostrar el mensaje de resultado
-                      Text(
-                        _message,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                        ),
-                      ),
-                      // Espacio para separar los botones de la tarjeta
-                      SizedBox(height: 20),
-                      // Row para alinear los botones horizontalmente
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: FloatingActionButton(
-                              onPressed: () {
-                                _updateCounter(1, 'add');
-                              },
-                              tooltip: 'Increment',
-                              child: SvgPicture.asset(
-                                'assets/icons/addition.svg',
-                                width: 40,
-                                height: 40,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: FloatingActionButton(
-                              onPressed: () {
-                                _updateCounter(1, 'subtract');
-                              },
-                              tooltip: 'Decrement',
-                              child: SvgPicture.asset(
-                                'assets/icons/subtraction.svg',
-                                width: 40,
-                                height: 40,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: FloatingActionButton(
-                              onPressed: () {
-                                setState(() {
-                                  _counter = 0;
-                                });
-                              },
-                              tooltip: 'Reload',
-                              child: SvgPicture.asset(
-                                'assets/icons/reload.svg',
-                                width: 40,
-                                height: 40,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Menú',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
                 ),
               ),
             ),
-          ),
-          // Espacio en blanco para dejar la mitad inferior vacía
-          SizedBox(height: MediaQuery.of(context).size.height / 6),
+            ListTile(
+              leading: const Icon(Icons.menu),
+              title: const Text('Menu'),
+              onTap: () {
+                navigateToPage(0);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.list),
+              title: const Text('Lista'),
+              onTap: () {
+                navigateToPage(1);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.details),
+              title: const Text('Detalles'),
+              onTap: () {
+                navigateToPage(2);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.sensor_door),
+              title: const Text('Sensores'),
+              onTap: () {
+                navigateToPage(3);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.gesture),
+              title: const Text('Gestos'),
+              onTap: () {
+                navigateToPage(4);
+              },
+            ),
+          ],
+        ),
+      ),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: onPageChanged,
+        children: const [
+          MenuScreen(),
+          HistoryScreen(),
+          GameScreen(),
+          SensorsScreen(),
+          GesturesScreen(),
         ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: onTabTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.menu),
+            label: 'Menu',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Listas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.details),
+            label: 'Detalle',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.sensor_door),
+            label: 'Sensores',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.gesture),
+            label: 'Gestos',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class MenuScreen extends StatelessWidget {
+  const MenuScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text(
+        'Menu',
+        style: TextStyle(fontSize: 24),
+      ),
+    );
+  }
+}
+
+class HistoryScreen extends StatelessWidget {
+  const HistoryScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: 10,
+      itemBuilder: (BuildContext context, int index) {
+        return Card(
+          margin: const EdgeInsets.all(8),
+          child: ListTile(
+            title: Text('Item ${index + 1}'),
+            onTap: () {},
+          ),
+        );
+      },
+    );
+  }
+}
+
+class GameScreen extends StatelessWidget {
+  const GameScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text(
+        'Juego',
+        style: TextStyle(fontSize: 24),
+      ),
+    );
+  }
+}
+
+class SensorsScreen extends StatelessWidget {
+  const SensorsScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text(
+        'Sensores',
+        style: TextStyle(fontSize: 24),
+      ),
+    );
+  }
+}
+
+class GesturesScreen extends StatelessWidget {
+  const GesturesScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text(
+        'Gestos',
+        style: TextStyle(fontSize: 24),
       ),
     );
   }
